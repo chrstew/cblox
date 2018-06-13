@@ -1,0 +1,9 @@
+node_modules/*
+npm-debug.log
+NOTES.md
+ssl/*
+credentials.js
+cosmicblocks/credentials.js
+cosmicblocks/client/client.js
+cosmicblocks/client/style.css
+cosmicblocks/client/sfx/*
