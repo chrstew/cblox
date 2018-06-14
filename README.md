@@ -10,4 +10,5 @@ Most work so far has been in cleaning up the reference implementation as well as
 - Optimized and cleaned up game logic
 - New chat commands
 - HTTP now works and doesn't 404 users
+- emoji shortcode support in chat ex :coffee: :heart:
 - Much better logging

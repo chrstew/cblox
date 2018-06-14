@@ -490,7 +490,7 @@ var handleDBResult = function(err, User, db) {
 							};
 							
 							//anons are negative twitter ids
-							if( socket.request.user.twitterid < 0){
+							if( !socket.request.user.twitterid || socket.request.user.twitterid < 0){
 								console.log('Anonymous account: '+ socket.request.user.username +' created.');
 								welcome(socket.id);
 								return;
@@ -734,8 +734,12 @@ var handleDBResult = function(err, User, db) {
 				case '/stats':
 					//
 					break;
+				
+				case '/help':
+					var helpStr = '<b>'+ APP_NAME +' Help:</b>';
+					sockit.emit('LOG_CHAT_MSG', helpStr);
+					break;
 				*/
-
 				
 				case '/clear':
 					socket.emit('LOG_CHAT_CLEAR');
@@ -784,8 +788,7 @@ var handleDBResult = function(err, User, db) {
 					//console.log('<#'+ room +'> '+ username +': '+ chatMessage);
 					chatLog(room, username, chatMessage);
 					break;
-				
-				
+
 			} // switch
 		});
 		
@@ -2781,8 +2784,14 @@ var handleDBResult = function(err, User, db) {
 							
 							// Currently anonymous users have negative twitter IDs
 							// This can be improved upon later
-							if(userData[playerIDs[0]].twitterid < 0) return;
-							if(userData[playerIDs[1]].twitterid < 0) return;
+							if( !userData[playerIDs[0]] ) return;
+							if( !userData[playerIDs[0]].twitterid) return;
+							if( userData[playerIDs[0]].twitterid < 0) return;
+							
+							if( !userData[playerIDs[1]] ) return;
+							if( !userData[playerIDs[1]].twitterid) return;
+							if( userData[playerIDs[1]].twitterid < 0) return;
+							
 							
 							if (typeof userData[playerIDs[0]] !== 'undefined') {
 								User.find({ twitterID: userData[playerIDs[0]].twitterid }, function (err, users){
@@ -3081,7 +3090,7 @@ var handleDBResult = function(err, User, db) {
 		if (typeof blockList[blockType] !== 'function') {
 			io.emit('LOG_CHAT_MSG', '<span class="redMsg">blockType not a function in getMoves()</span>');
 			return [[]];
-		} 
+		}
 		
 		// i found this cute trick online, instead of mass switch statement or if or w/e...
 		return blockList[blockType]();

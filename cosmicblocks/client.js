@@ -86,21 +86,21 @@ function resizeFunction() {
 		sizeBoard();
 	}
 	if ($("#blockListEditor").length > 0) {
-		let hWidth = hSpace();
+		var hWidth = hSpace();
 		$("#blockListEditor").css('width', hWidth);
 	}
 }
 
 function sidebarsResize() {
-  if ($(window).width() > 1450) {
-    var initialWidth = 222 + (($(window).width() - 1450) / 3);
-    if (initialWidth > 300) { initialWidth = 300; }
-  } else {
-    var initialWidth = 222;
-  }
+	var initialWidth = 222;
+	if( $(window).width() > 1450 ){
+		initialWidth = 222 + (($(window).width() - 1450) / 3);
+		if (initialWidth > 300) initialWidth = 300;
+	}
+	
 	$('#chatPanel').css('width', initialWidth + 'px');
 	$('#leaderboard').css('width', initialWidth + 'px');
-  //log(initialWidth);
+	//log(initialWidth);
 }
 
 function sizeBoard() {
@@ -112,9 +112,9 @@ function sizeBoard() {
 	var cols = Math.max.apply(Math, arr); //get the max value from the array
 	var rows = $(".board_row").length;
 	
-	let blockSize   = getBlockSize(rows, cols);
-	let boardWidth  = (cols * blockSize) +'px';
-	let boardHeight = (rows * blockSize) +'px';
+	var blockSize   = getBlockSize(rows, cols);
+	var boardWidth  = (cols * blockSize) +'px';
+	var  boardHeight = (rows * blockSize) +'px';
 	
 	$("#board").css('width', boardWidth);
 	$("#board").css('height', boardHeight);
@@ -125,7 +125,7 @@ function sizeBoard() {
 
 function hSpace() {
     // for board/menu sizing.
-	let horizontalSpace = $(window).width();
+	var horizontalSpace = $(window).width();
 	if ($("#chatPanel").is(":visible")) {
 		horizontalSpace -= $("#chatPanel").width();
 	}
@@ -133,19 +133,19 @@ function hSpace() {
 }
 
 function vSpace () {
-	let verticalSpace = $(window).height() - 38 - $("#menuContainer").height() - 10; // 38 is $("#gameHead").height() but hardcoded for now.
+	var verticalSpace = $(window).height() - 38 - $("#menuContainer").height() - 10; // 38 is $("#gameHead").height() but hardcoded for now.
 	return verticalSpace;
 }
 
 function getBlockSize(rows, cols) {
-	let blockSize = 50;
+	var blockSize = 50;
 	
 	// find available space
 	var horizontalSpace = hSpace();
 	var verticalSpace   = vSpace();
 	
-	let windowRatio = horizontalSpace / verticalSpace;
-	let boardRatio = cols / rows;
+	var windowRatio = horizontalSpace / verticalSpace;
+	var boardRatio  = cols / rows;
 	
 	//if board ratio wider than window ratio then horizontally max the board!
 	//if board ratio taller than the window ratio then vertically max the board!!
@@ -154,7 +154,7 @@ function getBlockSize(rows, cols) {
 	} else {
 		blockSize = Math.floor(verticalSpace / rows);
 	}
-
+	
 	return blockSize;
 }
 
@@ -345,11 +345,18 @@ function getSVG8by8(blockType, where) {
 			SVGString += '<rect class="shape" x="17.5" y="35" width="45" height="10"/>';
 			break;
 		
-		
+
 		case 'ovbar':
 			SVGString += oShape;
 		case 'vbar':
 			SVGString += '<rect class="shape" x="35" y="17.5" width="10" height="45"/>';
+			break;
+		
+		
+		case 'otlbr':
+			SVGString += oShape;		
+		case 'tlbr':
+			SVGString += '<rect class="shape" x="17.5" y="35" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 40 96.5684)" width="45" height="10"/>';
 			break;
 		
 		
@@ -358,6 +365,7 @@ function getSVG8by8(blockType, where) {
 		case 'bltr':
 			SVGString += '<rect class="shape" x="17.5" y="35" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 40 96.5684)" width="45" height="10"/>';
 			break;
+		
 		
 		case 'ice':
 			SVGString += '<rect fill="#B6E3FF" width="80" height="80"/>';
@@ -372,7 +380,8 @@ function getSVG8by8(blockType, where) {
 			SVGString += '<path d="M24.457,70.447c0,0,0.238-11.977,6.288-17.872C43.651,40,41.666,37.022,41.666,37.022s-4.964-1.986-11.694,4.082 c-6.729,6.066-11.692,8.493-12.134,3.86c0,0-6.288,0.221-5.957-3.86c0.331-4.082,13.127-19.084,14.893-24.159 c1.765-5.074,1.985-7.391,1.985-7.391s5.185,2.427,6.839,5.074c0,0,3.751-5.185,6.73-5.074l1.103,4.412 c0,0,12.024,1.765,16.988,14.672c4.964,12.907,4.964,41.809,4.964,41.809"/>';
 			SVGString += '<path fill="#AD0000" d="M31.347,22.019c0,0-6.067,3.162-6.067,7.281c0,0.184,0,0.441,0,0.441s4.964-1.765,5.516-4.743"/>';		
 			break;
-			
+		
+		
 		case 'mine':
 			SVGString += `
 			<g class="mineMetal">
@@ -770,10 +779,14 @@ function joinGame(gameID, moveCount, timeLeft, players, rows, cols, board, gameT
 		if (gameType === 'practice') {
 			if ($("#reset").length === 0) {
 				$("#gameButtons").prepend('<div class="buttonStyle" id="reset">Reset</div>');
+				
 				$("#reset").on("click",function() {
-					if (global_moveCount > 1) socket.emit('GAME_PRACTICE_RESET');
-					updateTimer(timerValue, 1);
+					if (global_moveCount > 1) {
+						socket.emit('GAME_PRACTICE_RESET');
+						updateTimer(false, 1);
+					}
 				});
+				
 			}
 		} else {
 			$("#gameButtons").prepend('<div class="buttonStyle" id="forfeit">Forfeit</div>');
